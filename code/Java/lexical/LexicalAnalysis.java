@@ -43,7 +43,40 @@ public class LexicalAnalysis implements AutoCloseable {
 
             switch (state) {
                 case 1:
-                    // TODO: Implement me!
+                    if (c == ' ' || c == '\t' || c == '\r') {
+                        state = 1;
+                    } else if (c == '\n') {
+                        line++;
+                        state = 1;
+                    } else if (c == '-') {
+                        lex.token += (char) c;
+                        state = 6;
+                    } else if (c == '.' || c == ',' || c == ';' || c == ':' ||
+                                c == '(' || c == ')' || c == '[' || c == ']' ||
+                                c == '{' || c == '}') {
+                        lex.token += (char) c;
+                        state = 14;
+                    } else if (c == '!') {
+                        lex.token += (char) c;
+                        state = 7;
+                    } else if (c == '&') {
+                        lex.token += (char) c;
+                        state = 9;
+                    } else if (c == '_' || c == '$' || Character.isLetter(c)) {
+                        lex.token += (char) c;
+                        state = 11;
+                    } else if (Character.isDigit(c)) {
+                        lex.token += (char) c;
+                        state = 12;
+                    } else if (c == -1) {
+                        lex.type = TokenType.END_OF_FILE;
+                        state = 15;
+                    } else {
+                        lex.token += (char) c;
+                        lex.type = TokenType.INVALID_TOKEN;
+                        state = 15;
+                    }
+
                     break;
                 case 2:
                     // TODO: Implement me!
@@ -58,25 +91,72 @@ public class LexicalAnalysis implements AutoCloseable {
                     // TODO: Implement me!
                     break;
                 case 6:
-                    // TODO: Implement me!
+                    if (c == '=' || c == '>') {
+                        lex.token += (char) c;
+                        state = 14;
+                    } else {
+                        ungetc(c);
+                        state = 14;
+                    }
+
                     break;
                 case 7:
-                    // TODO: Implement me!
+                    if (c == '=') {
+                        lex.token += (char) c;
+                        state = 14;
+                    } else if (c == 'i') {
+                        state = 8;
+                    } else {
+                        ungetc(c);
+                        state = 14;
+                    }
+
                     break;
                 case 8:
-                    // TODO: Implement me!
+                    if (c == 'n') {
+                        lex.token += "in";
+                        state = 14;
+                    } else {
+                        ungetc(c);
+                        ungetc('i');
+                        state = 14;
+                    }
+
                     break;
                 case 9:
-                    // TODO: Implement me!
+                    if (c == '&') {
+                        lex.token += (char) c;
+                        state = 14;
+                    } else {
+                        lex.type = TokenType.INVALID_TOKEN;
+                        state = 15;
+                    }
+
                     break;
                 case 10:
                     // TODO: Implement me!
                     break;
                 case 11:
-                    // TODO: Implement me!
+                    if (c == '$' || c == '_' ||
+                            Character.isLetter(c) || Character.isDigit(c)) {
+                        lex.token += (char) c;
+                        state = 11;
+                    } else {
+                        ungetc(c);
+                        state = 14;
+                    }
+
                     break;
                 case 12:
-                    // TODO: Implement me!
+                    if (Character.isDigit(c)) {
+                        lex.token += (char) c;
+                        state = 12;
+                    } else {
+                        ungetc(c);
+                        lex.type = TokenType.NUMBER;
+                        state = 15;
+                    }
+
                     break;
                 case 13:
                     // TODO: Implement me!
